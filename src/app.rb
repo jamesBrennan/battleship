@@ -26,10 +26,13 @@ class App
   private
 
   def validate_coords(coords)
+    #validate range
     coords.each do |x, y|
       if x > 9 or x < 0 or y > 9 or y < 0
         return false
       end
+      # if square is occupied return false
+      return false if @board[y][x]
     end
 
     true

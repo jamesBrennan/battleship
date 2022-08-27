@@ -59,6 +59,24 @@ RSpec.describe App do
         end.to_not change { @game.board }
       end
     end
+
+    context 'given a piece that would overlap an occupied square' do
+      before do
+        #place first ship
+        @game.place_ship(2, [0, 0], 'VERTICAL')
+      end
+
+      it 'returns false' do
+        # try to place secord ship overlapping first
+        expect(@game.place_ship(3, [0, 1], 'HORIZONTAL')).to be_falsey
+      end
+
+      it 'does not modify the board' do
+        expect do
+          @game.place_ship(3, [0, 1], 'HORIZONTAL')
+        end.to_not change { @game.board }
+      end
+    end
   end
 
   describe '.fire' do
