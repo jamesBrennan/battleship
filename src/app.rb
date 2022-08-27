@@ -1,3 +1,5 @@
+require './src/ship'
+
 class App
   attr_reader :board
 
@@ -5,6 +7,7 @@ class App
     @board = 10.times.map do
       10.times.map { nil }
     end
+    @ships = []
   end
 
   def print
@@ -16,14 +19,36 @@ class App
     target_coords = get_target_coordinates(length, location, orientation)
     return false unless validate_coords(target_coords)
 
+    ship = Ship.new(length)
+    @ships.push(ship)
+
     target_coords.each do |x, y|
-      @board[y][x] = true
+      @board[y][x] = ship
     end
 
     true
   end
 
+  def fire(coords)
+    x, y = coords
+    square = @board[y][x]
+
+    case square
+    when nil
+      'MISS'
+    when Ship
+      square.hit
+      return 'WIN' if win?
+
+      square.sunk? ? 'SUNK' : 'HIT'
+    end
+  end
+
   private
+
+  def win?
+    @ships.all? { |ship| ship.sunk? }
+  end
 
   def validate_coords(coords)
     #validate range

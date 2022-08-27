@@ -27,14 +27,14 @@ RSpec.describe App do
         expect(@game.place_ship(@ship, @location, @orientation)).to be_truthy
       end
 
-      it 'toggles the values on the board to true' do
+      it 'toggles the values on the board to OCCUPIED' do
         @game.place_ship(@ship, @location, @orientation)
         board = @game.board
 
         #occupied squares
         # board[y][x]
-        expect(board[0][0]).to be_truthy
-        expect(board[1][0]).to be_truthy
+        expect(board[0][0]).to be_a_kind_of(Ship)
+        expect(board[1][0]).to be_a_kind_of(Ship)
 
         #empty squares
         expect(board[1][1]).to be_nil
@@ -80,6 +80,44 @@ RSpec.describe App do
   end
 
   describe '.fire' do
+    context 'given coordinates for an empty square' do
+      it 'returns MISS' do
+        expect(@game.fire([0,0])).to eql('MISS')
+      end
+    end
 
+    context 'given coordinates for an occupied square' do
+      before do
+        @game.place_ship(2, [0, 0], 'VERTICAL')
+      end
+
+      it 'returns HIT' do
+        expect(@game.fire([0,0])).to eql('HIT')
+      end
+    end
+
+    context 'given coordinates for the last square of a ship' do
+      before do
+        @game.place_ship(2, [0, 0], 'VERTICAL')
+        @game.place_ship(3, [1, 0], 'VERTICAL')
+
+        @game.fire([0,0])
+      end
+
+      it 'returns SUNK' do
+        expect(@game.fire([0,1])).to eql('SUNK')
+      end
+    end
+
+    context 'given coordinates that sink the last ship' do
+      before do
+        @game.place_ship(2, [0, 0], 'VERTICAL')
+        @game.fire([0,0])
+      end
+
+      it 'returns WIN' do
+        expect(@game.fire([0,1])).to eql('WIN')
+      end
+    end
   end
 end
