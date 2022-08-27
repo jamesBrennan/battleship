@@ -1,15 +1,49 @@
 class App
-  def self.max_subarray(input)
-    len = input.length - 1
-    value = -1_000_000_000
+  attr_reader :board
 
-    (0..len).each do |start_index|
-      (start_index..len).each do |end_index|
-        subarray = input[start_index..end_index]
-        value = [subarray.sum, value].max
+  def initialize
+    @board = 10.times.map do
+      10.times.map { nil }
+    end
+  end
+
+  def print
+    @board.each { |row| p row }
+  end
+
+  def place_ship(length, location, orientation)
+    # find squares to operate on
+    target_coords = get_target_coordinates(length, location, orientation)
+    return false unless validate_coords(target_coords)
+
+    target_coords.each do |x, y|
+      @board[y][x] = true
+    end
+
+    true
+  end
+
+  private
+
+  def validate_coords(coords)
+    coords.each do |x, y|
+      if x > 9 or x < 0 or y > 9 or y < 0
+        return false
       end
     end
 
-    value
+    true
+  end
+
+  # return an array of coordinates
+  def get_target_coordinates(length, location, orientation)
+    x, y = location
+
+    case orientation
+    when 'VERTICAL'
+      (0...length).map { |n| [x, y+n] }
+    when 'HORIZONTAL'
+      (0...length).map { |n| [x+n, y] }
+    end
   end
 end
